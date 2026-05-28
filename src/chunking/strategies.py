@@ -4,7 +4,7 @@ from langchain_core.documents import Document
 import re
 
 #Concrete Strategy 1
-class Fixedsizedchunking(Basechunker):
+class FixedSizedChunking(Basechunker):
     """
     Splits by a fixed character window with no structural awareness.
     Baseline — intentionally breaks tables and risk items for comparison.
@@ -18,7 +18,7 @@ class Fixedsizedchunking(Basechunker):
 
 
 #Concrete Strategy 2
-class Recursivestextsplitter(Basechunker):
+class RecursiveTextChunker(Basechunker):
     def __init__(self,chunk_size=100, chunk_overlap=0):
         self._recursivetextsplitter = RecursiveCharacterTextSplitter(
             chunk_size = chunk_size,
@@ -39,7 +39,7 @@ _SECTION_PATTERN = re.compile(
     re.MULTILINE | re.IGNORECASE
 )
 
-class Financesectionchunker(Basechunker):
+class FinanceSectionChunker(Basechunker):
     def __init__(self,max_section_size: int = 2000, chunk_overlap: int = 200):
         self._max = max_section_size
         self._secondary = RecursiveCharacterTextSplitter(

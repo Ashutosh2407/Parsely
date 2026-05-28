@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from langchain_core.documents import Document
 import statistics
 
-class Basechunker(ABC):
+class BaseChunker(ABC):
     """
     Strategy Interface.
     All chunkers must implement split().
