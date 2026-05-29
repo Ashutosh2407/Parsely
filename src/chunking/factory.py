@@ -1,8 +1,8 @@
-from src.chunking.strategies import FinanceSectionChunker,FixedSizedChunking,RecursiveTextChunker
+from src.chunking.strategies import FinanceSectionChunker,FixedSizedChunker,RecursiveTextChunker
 from src.chunking.context import ChunkingContext
 
 _REGISTRY = {
-    "fixed": FixedSizedChunking,
+    "fixed": FixedSizedChunker,
     "recursive": RecursiveTextChunker,
     "section": FinanceSectionChunker
 }

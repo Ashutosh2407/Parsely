@@ -1,24 +1,24 @@
 from langchain_text_splitters import CharacterTextSplitter, RecursiveCharacterTextSplitter
-from src.chunking.base import Basechunker
+from src.chunking.base import BaseChunker
 from langchain_core.documents import Document
 import re
 
 #Concrete Strategy 1
-class FixedSizedChunking(Basechunker):
+class FixedSizedChunker(BaseChunker):
     """
     Splits by a fixed character window with no structural awareness.
     Baseline — intentionally breaks tables and risk items for comparison.
     """
-    def __init__(self,encoding_name="cl100k_base", chunk_size=100, chunk_overlap=0):
-        self._text_splitter = CharacterTextSplitter(encoding_name=encoding_name,chunk_size=chunk_size,chunk_size=chunk_overlap)
+    def __init__(self, chunk_size=100, chunk_overlap=0):
+        self._text_splitter = CharacterTextSplitter(chunk_size=chunk_size,chunk_overlap=chunk_overlap)
 
     def split(self, docs):
-        texts = self._text_splitter.split_text(docs)
+        texts = self._text_splitter.split_documents(docs)
         return texts
 
 
 #Concrete Strategy 2
-class RecursiveTextChunker(Basechunker):
+class RecursiveTextChunker(BaseChunker):
     def __init__(self,chunk_size=100, chunk_overlap=0):
         self._recursivetextsplitter = RecursiveCharacterTextSplitter(
             chunk_size = chunk_size,
@@ -26,7 +26,7 @@ class RecursiveTextChunker(Basechunker):
         )
 
     def split(self,docs):
-        texts = self._recursivetextsplitter.split_text(docs)
+        texts = self._recursivetextsplitter.split_documents(docs)
         return texts
 
 #Concrete Strategy 3
@@ -39,7 +39,7 @@ _SECTION_PATTERN = re.compile(
     re.MULTILINE | re.IGNORECASE
 )
 
-class FinanceSectionChunker(Basechunker):
+class FinanceSectionChunker(BaseChunker):
     def __init__(self,max_section_size: int = 2000, chunk_overlap: int = 200):
         self._max = max_section_size
         self._secondary = RecursiveCharacterTextSplitter(
