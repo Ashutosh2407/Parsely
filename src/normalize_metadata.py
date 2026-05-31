@@ -1,7 +1,8 @@
 import json
 from pathlib import Path
 from langchain_community.document_loaders import PyPDFLoader
-from corpus_config import CORPUS
+from src.corpus_config import CORPUS
+from src.ingest import load_all_docs, DIR_PATH
 import logging
 import time
 
@@ -12,7 +13,7 @@ def build_chunk_id(meta:dict,page:str) -> str:
     return f"{meta["ticker"]}_{meta["filing_type"].replace('-','').upper()}_{meta['year']}{quarter}_p{page}"
 
 def load_and_normalize()->list[dict]:
-    all_chunks = []
+    all_pages = []
     manifest_entries = []
     
     for doc_meta in CORPUS:
@@ -32,7 +33,7 @@ def load_and_normalize()->list[dict]:
                 "chunk_id": build_chunk_id(doc_meta,page_num)
             }
             doc.metadata.update(normalized)
-            all_chunks.append(doc)
+            all_pages.append(doc)
 
         # Manifest: one entry per source document
         manifest_entries.append({
@@ -41,7 +42,7 @@ def load_and_normalize()->list[dict]:
             "chunks_loaded":len(pages)
         })
 
-    return all_chunks,manifest_entries
+    return all_pages,manifest_entries
 
 def save_manifest(entries:list[dict], path="manifest.json"):
     Path(path).parent.mkdir(parents=True, exist_ok=True)

@@ -19,7 +19,8 @@ path = "/Users/ashutoshwagh/Desktop/projects/financial-rag-agent/data/goldman_sa
 # print("🗑️  Index cleared")
 
 pages, manifest = load_and_normalize()
-
+print(len(pages))
+print(len(manifest))
 ctx = get_chunking_context("section")
 split_chunks = ctx.chunk(pages)
 
