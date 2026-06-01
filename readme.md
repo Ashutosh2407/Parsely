@@ -16,4 +16,4 @@ grounded, cited answers from a structured corpus of SEC filings.
 - **Total chunks indexed:** ~2500 chunks across 5 documents.
 
 ## Day 4 Retrieval Test Results
-![Langchain Dashboard](langchain dashboard.png)
+![Langchain Dashboard](langchaindashboard.png)
