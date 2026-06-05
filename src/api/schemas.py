@@ -3,7 +3,7 @@ from typing import Literal
 
 class AnswerSchema(BaseModel):
     answer:str
-    confidenece: float = Field(ge=0.0, le=1.0)
+    confidence: float = Field(ge=0.0, le=1.0)
     citations: list[str] = Field(default_factory = list)
     sources: list[str] = Field(default_factory= list)
     cost_usd: float = Field(ge=0.0)
@@ -18,7 +18,7 @@ class EvalQuestionSchema(BaseModel):
         "segment_commentary",
         "management_guidance"
         ]
-    expected_source: Literal["10-K"]
+    sources: Literal["10-K"]
     target_companies: list[str] = Field(..., min_length=1)
     difficulty: Literal["easy", "medium", "hard"]
     requires_table_parsing: bool

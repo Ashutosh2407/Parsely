@@ -15,6 +15,7 @@ from src.api.main import build_llm_chain
 from src.api.schemas import AnswerSchema,EvalQuestionSchema
 import asyncio
 import logging
+import time 
 
 load_dotenv()
 
@@ -26,9 +27,9 @@ os.makedirs("src/eval/datasets", exist_ok=True)
 embeddings = HuggingFaceEmbeddings(model_name = "sentence-transformers/all-MiniLM-L6-v2")
 vectorstore = PineconeVectorStore(embedding=embeddings,index_name="test-index")
 retriever = vectorstore.as_retriever(search_kwargs={"k":5})
+RESULTS = []
 
-async def get_answer(request: EvalQuestionSchema)->AnswerSchema:
-    results = []
+async def get_answer(request: EvalQuestionSchema):
     for item in request:
         question = item["question"]
         #Pinecone retrieval
@@ -44,16 +45,31 @@ async def get_answer(request: EvalQuestionSchema)->AnswerSchema:
         #Generate Structured Answer
         chain = build_llm_chain()
         try:
-            result: AnswerSchema = await chain.ainvoke(
+            result= await chain.ainvoke(
                 {"question":question, "context":context}
             )
         except Exception as e:
-            raise ValueError("Not conforming to answerschema.")
+            raise ValueError(f"Could not generate answer for {question}.")
         
-        results.append(result.model_dump())
-        
+        RESULTS.append(
+            {
+                "question":question,
+                "answer":result.answer,
+                "ground_truth": item["ground_truth"],
+                "category": item["category"],
+                "expected_source": item["sources"],
+                "actual_sources": result.sources,
+                "target_companies": item["target_companies"],
+                "reference_period": item["reference_period"],
+                "citations": result.citations,
+            }
+        )
+        break
+        time.sleep(5)
     with open("src/eval/datasets/eval_dataset.json","w") as f:
-        json.dump(results,f, indent=2)
+        json.dump(RESULTS,f, indent=2)
 
 result = asyncio.run(get_answer(test_set["questions"]))
+
+
 
