@@ -4,7 +4,7 @@
 #     a) faithfulness
 #     b)answer_relevance
 #     c)context_precision
-# 4)Once the result is generated, save it in results.csv
+# 4)Once the result is generated, save it in eval_dataset.json
 
 import os, json
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -56,15 +56,16 @@ async def get_answer(request: EvalQuestionSchema):
                 "question":question,
                 "answer":result.answer,
                 "ground_truth": item["ground_truth"],
+                "contexts": [d.page_content for d in docs],
                 "category": item["category"],
-                "expected_source": item["sources"],
+                "expected_source": item["expected_source"],
                 "actual_sources": result.sources,
                 "target_companies": item["target_companies"],
                 "reference_period": item["reference_period"],
                 "citations": result.citations,
             }
         )
-        break
+        #break
         time.sleep(5)
     with open("src/eval/datasets/eval_dataset.json","w") as f:
         json.dump(RESULTS,f, indent=2)
