@@ -3,14 +3,21 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_pinecone import PineconeVectorStore
+from langchain_community.callbacks import get_openai_callback
 from langchain_groq import ChatGroq
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel,Field
 from dotenv import load_dotenv
 from src.api.schemas import AnswerSchema, QueryRequest
+import logging
 
 load_dotenv()
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 # ---------------------------------------------------------------------------
@@ -29,14 +36,20 @@ def build_llm_chain():
         api_key=os.environ.get("OPENAI_API_KEY"),
         max_tokens = 4096
     )
-    
-    
-    structured_llm = llm.with_structured_output(AnswerSchema)
+        
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are a helpful RAG assistant. Answer using ONLY the retrieved context."),
+        ("system", """You are a helpful RAG assistant. Answer using ONLY the retrieved context.
+        At the end of the end of your answer, OUTPUT a json block (and nothing after it) in this exact format:
+         ```json
+         {{
+            "confidence":0.92,
+            "citations":["[Chunk 0]","[Chunk 1]"]
+         }}
+         ```
+         """),
         ("human","Question:{question}\n\nContext:\n{context}\n\nProvide a structured answer."),
     ])
-    return prompt | structured_llm
+    return prompt | llm
 
 # ---------------------------------------------------------------------------
 # Endpoints
@@ -64,12 +77,20 @@ async def query(request: QueryRequest)-> AnswerSchema:
     # 3. Generate structured answer
     chain = build_llm_chain()
     try:
-        result: AnswerSchema = await chain.ainvoke(
-            {"question":question, "context":context}
-        )
+        with get_openai_callback() as cb:
+            result: AnswerSchema = await chain.ainvoke(
+                {"question":question, "context":context}
+            )
+        result.prompt_tokens = cb.prompt_tokens
+        result.completion_tokens = cb.completion_tokens
+        result.cost_usd = cb.total_cost
+        logger.info(f"Prompt tokens: {cb.prompt_tokens}")
+        logger.info(f"Completion tokens: {cb.completion_tokens}")
+        logger.info(f"Total tokens: {cb.total_tokens}")
+        logger.info(f"Cost: ${cb.total_cost:.6f}")
     except Exception as e:
         raise HTTPException(status_code=502,detail=f"LLM call failed: {e}")
-
+    
     # 4. Attach Real source metadata
     result.sources.extend([
         {
