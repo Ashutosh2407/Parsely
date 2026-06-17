@@ -41,6 +41,7 @@ def build_llm_chain():
         
     prompt = ChatPromptTemplate.from_messages([
         ("system", """You are a helpful RAG assistant. Answer using ONLY the retrieved context.
+        Write in plain prose. Do NOT use backticks, bold, bullet points, or any markdown in your answer text.
         At the end of the end of your answer, OUTPUT a json block (and nothing after it) in this exact format:
          ```json
          {{

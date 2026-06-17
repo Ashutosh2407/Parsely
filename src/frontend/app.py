@@ -4,6 +4,7 @@ import requests
 import plotly.express as px
 import time
 import os
+import re
 import json
 from dotenv import load_dotenv
 from langsmith import Client
@@ -79,9 +80,15 @@ if st.button("Ask") and question:
                                     full_answer += payload.get("content","")
                                     stream_box.markdown(full_answer + "▌")
                                 elif payload.get("type") == "final":
-                                    stream_box.markdown(full_answer)
+                                    #print("RAW:", repr(full_answer))                          # see exact characters
+                                    clean = full_answer.split("```")[0].strip()
+                                    #print("AFTER SPLIT:", repr(clean))                        # see if split worked
+                                    clean = re.sub(r'`([^`]*)`', r'\1', clean)
+                                    #print("AFTER REGEX:", repr(clean))                        # see if regex worked
+                                    stream_box.empty()
+                                    clean = clean.replace("$","\$")
+                                    stream_box.markdown(clean)
                                     full_payload = payload.get("data")
-                                    #print("FINAL:", full_payload)
                             except json.JSONDecodeError as e:
                                 pass
             
