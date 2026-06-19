@@ -8,6 +8,7 @@ annotated-types==0.7.0
 anyio==4.13.0
 appdirs==1.4.4
 attrs==26.1.0
+Authlib==1.7.2
 blinker==1.9.0
 cachetools==7.1.4
 certifi==2026.5.20
@@ -38,7 +39,7 @@ google-auth-httplib2==0.4.0
 google-generativeai==0.8.6
 googleapis-common-protos==1.75.0
 groq==0.37.1
-grpcio==1.81.0
+grpcio==1.78.0
 grpcio-status==1.71.2
 h11==0.16.0
 h2==4.3.0
@@ -58,6 +59,7 @@ itsdangerous==2.2.0
 Jinja2==3.1.6
 jiter==0.13.0
 joblib==1.5.3
+joserfc==1.7.1
 jsonpatch==1.33
 jsonpointer==3.1.1
 jsonschema==4.26.0
@@ -162,7 +164,9 @@ urllib3==2.7.0
 uuid_utils==0.16.0
 uvicorn==0.48.0
 uvloop==0.22.1
+validators==0.35.0
 watchfiles==1.2.0
+weaviate-client==4.22.0
 websockets==16.0
 xxhash==3.7.0
 yarl==1.24.2
