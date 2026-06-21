@@ -44,7 +44,7 @@ def load_and_normalize(corpus)->list[dict]:
 
     return all_pages,manifest_entries
 
-def save_manifest(entries:list[dict], path="src/manifest_internal_research.json"):
+def save_manifest(entries:list[dict], path="src/manifest_earnings_transcript.json"):
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     with open(path,"w") as f:
         json.dump(entries,f,indent = 2)
@@ -71,7 +71,7 @@ def inspect_10k_chunks(chunks, ticker="JPM", n=5):
 
 if __name__ == "__main__":
     start = time.time()
-    pages, manifest = load_and_normalize()
+    pages, manifest = load_and_normalize(CORPUS_EARNINGS_TRANSCRIPT)
     save_manifest(manifest)
     print(f"Total pages loaded: {len(pages)}")
     end = time.time()

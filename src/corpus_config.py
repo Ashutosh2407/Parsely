@@ -52,7 +52,7 @@ CORPUS_EARNINGS_TRANSCRIPT = [
         "ticker": "AAPL",
         "company": "Apple",
         "filing_type": "Earnings Call Transcript",
-        "quarter": '',
+        "quarter": 'Q1',
         "year":2026,
         "source_url":"",
         "local_path": "/Users/ashutoshwagh/Desktop/projects/financial-rag-agent/data/apple_earnings_call_transcript.pdf"
@@ -61,7 +61,7 @@ CORPUS_EARNINGS_TRANSCRIPT = [
         "ticker": "MSFT",
         "company": "Microsoft",
         "filing_type": "Earnings Call Transcript",
-        "quarter": '',
+        "quarter": 'Q3',
         "year":2026,
         "source_url":"",
         "local_path": "/Users/ashutoshwagh/Desktop/projects/financial-rag-agent/data/microsoft_earnings_call_transcript.pdf"
@@ -70,7 +70,7 @@ CORPUS_EARNINGS_TRANSCRIPT = [
         "ticker": "JPM",
         "company": "JP Morgan Chase",
         "filing_type": "Earnings Call Transcript",
-        "quarter": '',
+        "quarter": 'Q1',
         "year":2026,
         "source_url":"",
         "local_path": "/Users/ashutoshwagh/Desktop/projects/financial-rag-agent/data/jpmc_earnings_call_transcript.pdf"
@@ -79,7 +79,7 @@ CORPUS_EARNINGS_TRANSCRIPT = [
         "ticker": "TSLA",
         "company": "Tesla",
         "filing_type": "Earnings Call Transcript",
-        "quarter": '',
+        "quarter": 'Q1',
         "year":2026,
         "source_url":"",
         "local_path": "/Users/ashutoshwagh/Desktop/projects/financial-rag-agent/data/tesla_earnings_call_transcript.pdf"
@@ -88,7 +88,7 @@ CORPUS_EARNINGS_TRANSCRIPT = [
         "ticker": "GS",
         "company": "Goldman Sachs",
         "filing_type": "Earnings Call Transcript",
-        "quarter": '',
+        "quarter": 'Q1',
         "year":2026,
         "source_url":"",
         "local_path": "/Users/ashutoshwagh/Desktop/projects/financial-rag-agent/data/goldman_sachs_earnings_call_transcript.pdf"
