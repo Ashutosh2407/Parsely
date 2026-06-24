@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from ragas.metrics.collections import Faithfulness,AnswerRelevancy,ContextPrecision
+from ragas.metrics import NonLLMContextRecall
+from ragas.metrics.collections import Faithfulness,AnswerRelevancy,ContextPrecision, ContextRecall
 
 class BaseMetric(ABC):
     name: str #used as csv column name
@@ -53,3 +54,19 @@ class ContextPrecisionMetric(BaseMetric):
                     )
         return result.value
                     
+
+class ContextRecallMetric(BaseMetric):
+    name= "recall@6"
+
+    def __init__(self, llm):
+        self.metric = ContextRecall(llm=llm)
+
+    async def score(self,item:dict) -> float:
+        result = await self.metric.ascore(
+            user_input= item["question"],
+            retrieved_contexts= item["contexts"],
+            reference= item["ground_truth"]
+        )
+        return result.value
+
+

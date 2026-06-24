@@ -1,7 +1,7 @@
 from datasets import load_dataset
 from ragas.llms import llm_factory
 from ragas.embeddings import HuggingFaceEmbeddings
-from src.eval.metrics import FaithfulnessMetric,ContextPrecisionMetric,AnswerRelevancyMetric
+from src.eval.metrics import FaithfulnessMetric,ContextPrecisionMetric,AnswerRelevancyMetric, ContextRecallMetric
 from openai import AsyncOpenAI
 import asyncio
 import os
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 #Read the Data
-dataset_dict = load_dataset("json", data_files="src/eval/datasets/eval_dataset_compression.json")
+dataset_dict = load_dataset("json", data_files="src/eval/datasets/eval_dataset_weaviate.json")
 dataset_intermediate = dataset_dict["train"]
 dataset = [dict(row) for row in dataset_intermediate]
 
@@ -51,7 +51,8 @@ def batch_helper(dataset,size):
 metrics = [
     FaithfulnessMetric(llm = ragas_llm),
     AnswerRelevancyMetric(llm=ragas_llm,embeddings=ragas_embeddings),
-    ContextPrecisionMetric(llm = ragas_llm)
+    ContextPrecisionMetric(llm = ragas_llm),
+    ContextRecallMetric(llm = ragas_llm)
 ]
 
 
