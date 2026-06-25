@@ -113,10 +113,11 @@ async def get_answer(questions: EvalQuestionSchema, strategy:str):
         time.sleep(5)
 
 
-async def get_answer_weaviate(questions: EvalQuestionSchema,strategy:str):
+async def get_answer_weaviate(questions: EvalQuestionSchema,strategy:str,search_type:str="dense"):
+    i=1
     for item in questions:
         question = item["question"]
-        chunk_results = query_all(query =question,limit=2)
+        chunk_results = query_all(query =question,limit=2,search_type=search_type)
         #Build context from your real chunks
         context = "\n\n".join(
             f"[Chunk {i}] Source: {r.properties.get('source', '?')} | "
@@ -136,7 +137,7 @@ async def get_answer_weaviate(questions: EvalQuestionSchema,strategy:str):
             raise ValueError(f"Could not generate answer for {question}.")
         
         row = {
-                "strategy":"weaviate",
+                "strategy":"weaviate_"+search_type,
                 "question":question,
                 "answer":llm_result.answer,
                 "ground_truth": item["ground_truth"],
@@ -148,9 +149,10 @@ async def get_answer_weaviate(questions: EvalQuestionSchema,strategy:str):
                 "reference_period": item["reference_period"],
                 "citations": llm_result.citations,
             }
-        with open(f"src/eval/datasets/eval_dataset_{strategy}.json", "a") as f:
+        with open(f"src/eval/datasets/eval_dataset_{strategy}_{search_type}.json", "a") as f:
             f.write(json.dumps(row) + "\n")
-        
+        print(f"Question {i} is done.")
+        i+=1
         time.sleep(5)
 
     
@@ -165,7 +167,9 @@ async def get_answer_weaviate(questions: EvalQuestionSchema,strategy:str):
 
 #result_compression = asyncio.run(get_answer(test_set["questions"],strategy="compression"))
 
-result_weaviate = asyncio.run(get_answer_weaviate(test_set["questions"],strategy="weaviate"))
+#result_weaviate = asyncio.run(get_answer_weaviate(test_set["questions"],strategy="weaviate",search_type="dense"))
+
+#result_weaviate = asyncio.run(get_answer_weaviate(test_set["questions"],strategy="weaviate",search_type="hybrid"))
 
 
 

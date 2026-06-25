@@ -16,7 +16,7 @@ collections = {
 
 model = SentenceTransformer("all-MiniLM-L6-v2") 
 
-def _query(collection_name,query,ticker=None,year=None,quarter=None,filing_type=None,limit=5):
+def _query(collection_name,query,ticker=None,year=None,quarter=None,filing_type=None,limit=5,search_type="dense"):
     
     collection = client.collections.get(collection_name)
     query_vector = model.encode(query).tolist()
@@ -34,10 +34,18 @@ def _query(collection_name,query,ticker=None,year=None,quarter=None,filing_type=
         filter_filing_type = Filter.by_property("filing_type").equal(filing_type)
         filters = filters & filter_filing_type if filters else filter_filing_type
 
-    #dense retrieval
-    return collection.query.near_vector(near_vector=query_vector,limit=limit,filters=filters)
 
-def query_all(query,ticker=None,year=None,quarter=None,filing_type=None,limit=5):
+    if search_type == "hybrid":
+        return collection.query.hybrid(
+            query=query,
+            limit=limit,
+            filters=filters,
+            alpha = 0.6
+        )   
+    else:#dense retrieval
+        return collection.query.near_vector(near_vector=query_vector,limit=limit,filters=filters)
+
+def query_all(query,ticker=None,year=None,quarter=None,filing_type=None,limit=5,search_type="dense"):
     
     results = []
     for collection_name in collections.values():
