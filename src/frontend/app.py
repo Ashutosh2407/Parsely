@@ -23,7 +23,7 @@ if "thread_id" not in st.session_state:
 with st.expander("📈 Ragas Benchmark"):
     df_eval = pd.read_csv("src/eval/results.csv")
     df_agg = df_eval.groupby("strategy")[["faithfulness", "answer_relevance", "context_precision"]].mean().reset_index()
-    strategy_order = ["dense", "sparse", "hybrid", "compression"]
+    strategy_order = ["dense", "sparse", "hybrid", "compression","weaviate"]
     df_agg["strategy"] = pd.Categorical(df_agg["strategy"], categories=strategy_order, ordered=True)
     df_agg = df_agg.sort_values("strategy")
     col_table, col_chart = st.columns([1, 2])
