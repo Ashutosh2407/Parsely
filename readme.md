@@ -27,6 +27,21 @@ grounded, cited answers from a structured corpus of SEC filings.
 | Compresession (rerank)|  0.68        | 0.87             | 0.62              |
 | Weaviate	            |  0.67	       | 0.72	            | 0.39              |
 
+```mermaid
+flowchart TD
+    __start__([<p>__start__</p>]):::first
+        contextualize(contextualize)
+        retrieve(retrieve)
+        __end__([<p>__end__</p>]):::last
+        __start__ --> contextualize;
+        contextualize --> retrieve;
+        retrieve --> __end__;
+        classDef default fill:#f2f0ff,line-height:1.2
+        classDef first fill-opacity:0
+        classDef last fill:#bfb6fc
+```
+
+
 ## Demo 1
 ![Demo](https://github.com/user-attachments/assets/e84c8cd8-b5ae-4bb0-a876-7037f83bc7e9)
 
