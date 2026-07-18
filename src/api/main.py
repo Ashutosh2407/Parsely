@@ -109,22 +109,19 @@ async def query(request: QueryRequest):
                                                                   config=config,
                                                                   stream_mode=["updates"],
                                                                   ):
-                    
+                    #print(stream_type,event_data)
                     if stream_type=="updates":
                         for node_name, state_diff in event_data.items():
                             if node_name == "__interrupt__":
                                 payload = state_diff[0].value
-                                yield f"data: {json.dumps({'type':'interrupt','payload':payload})}\n\n"
+                                yield f"data:{json.dumps({'type':'interrupt','payload':payload})}\n\n"
                                 return
                             final_state.update(state_diff)
                     
                             if node_name == "hallucination_checker_node" and state_diff.get("confidence",0.0)>=CONFIDENCE_THRESHOLD:
-                                answer_text = final_state.get("answer", "").split("```json").strip()
+                                answer_text = final_state.get("answer", "").split("```json")[0].strip()
                                 for word in answer_text.split(" "):
                                     yield f"data:{json.dumps({'type': 'token','content':word})}\n\n"
-                               
-                                # if "```json" not in full_response:
-                                #     yield f"data:{json.dumps({'type': 'token','content':token})}\n\n"      
         except Exception as e:
             yield f"data:{json.dumps({'type':'error','detail': str(e)})}\n\n"
             return
@@ -152,6 +149,13 @@ async def query(request: QueryRequest):
     
     #7.Return the stream to FastAPI
     return StreamingResponse(stream_response(),media_type="text/event-stream")
+
+#stream_type, event_data :OUTPUT
+#updates {'guardrails_input': {'blocked': False}}
+#updates {'retriever_node': 
+# {'chunks': ['pricing to offset the U.S. dollar’s strengthening, which would adversely affect the U.S. 
+# dollar value of the gross margins the Company\nearns on foreign currency–denominated sales.
+# \nApple Inc. | 2025 Form 10-K | ....... 73/77']}}
 
 @app.post("/resume")
 async def resume_query(request:ResumeRequest):
