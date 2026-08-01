@@ -16,6 +16,28 @@ grounded, cited answers from a structured corpus of SEC filings.
 - **Vector store:** Pinecone (sentence-transformers/all-MiniLM-L6-v2, 384 dims).
 - **Total chunks indexed:** ~2500 chunks across 5 documents.
 
+## Features
+
+### Safety & Trust
+- **Input guardrails** — every query is screened before retrieval; unsafe or out-of-scope queries short-circuit to END without burning an LLM call.
+- **Output guardrails** — every generated answer is screened before it reaches the user. No path returns an answer that skipped this check.
+- **Grounding verification** — an LLM-as-judge compares the draft answer against the retrieved chunks and emits a confidence score. Answers below 0.75 never ship unreviewed.
+- **Source attribution** — every answer carries structured provenance: chunk ID, ticker, filing year, source document, and a text preview. Web-sourced answers carry title, URL, and preview instead.
+
+### Retrieval Quality
+- **Relevance grading** — retrieved chunks are scored 0–1 for relevance to the question. Below an average of 0.6, the pipeline stops trusting the corpus.
+- **Web search fallback** — when the corpus can't answer (grade < 0.6), the query is routed to Tavily rather than forcing a hallucinated answer out of irrelevant chunks.
+- **Benchmarked strategy selection** — dense, sparse, hybrid, reranked, and Weaviate retrieval were evaluated on faithfulness, answer relevance, and context precision (see table above).
+
+### Self-Correction
+- **Automatic regeneration** — a low-confidence answer triggers one retry at higher temperature (0.0 → 0.7) to sample a different response rather than repeating a deterministic failure.
+- **Bounded retries** — capped at 2 generations, so a hard question escalates instead of looping.
+- **Human-in-the-loop review** — persistent low confidence pauses the graph mid-execution via LangGraph `interrupt`, surfacing the draft answer, confidence score, and supporting chunks to an analyst. Approve to release; reject to return a clean "not found" instead of a guess.
+
+### Conversation
+- **Multi-turn context** — follow-up questions are rewritten into standalone queries before retrieval, so "what about their debt?" resolves against the prior turn.
+- **Durable state** — a checkpointer persists graph state per thread, which is what makes mid-run interrupt-and-resume possible across separate invocations.
+
 ## Day 4 Retrieval Test Results
 ![Langchain Dashboard](langchaindashboard.png)
 
@@ -30,7 +52,7 @@ grounded, cited answers from a structured corpus of SEC filings.
 
 ## Langraph Graph
 
-mermaid
+```mermaid
 graph TD
     START([START]) --> GI[guardrails_input]
 
@@ -63,7 +85,7 @@ graph TD
     class GI,GO guard
     class START,END1,END2,END3,END4 term
     class HR human
-
+```
 
 ## Contextualization Flow (for Follow up questions)
 ```mermaid
