@@ -91,3 +91,5 @@ flowchart TD
 <div style="position: relative; padding-bottom: 56.25%; height: 0;"><iframe src="https://www.loom.com/embed/164c78fb8d3449a0a2221e20fe7bb7e5" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
 
 [![Watch the video](https://www.loom.com/share/164c78fb8d3449a0a2221e20fe7bb7e5)](https://www.loom.com/share/164c78fb8d3449a0a2221e20fe7bb7e5)
+
+[![Watch the demo](https://cdn.loom.com/sessions/thumbnails/164c78fb8d3449a0a2221e20fe7bb7e5-with-play.gif)](https://www.loom.com/share/164c78fb8d3449a0a2221e20fe7bb7e5)
