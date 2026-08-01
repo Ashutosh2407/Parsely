@@ -17,12 +17,12 @@ load_dotenv()
 
 CONFIDENCE_THRESHOLD = 0.75
 
-def build_llm_chain():
+def build_llm_chain(temperature:float = 0.0):
     llm = ChatOpenAI(
         model="gpt-4o-mini",
         api_key=os.environ.get("OPENAI_API_KEY"),
         max_tokens = 4096,
-        temperature=0
+        temperature=temperature
     )
         
     prompt = ChatPromptTemplate.from_messages([
@@ -70,7 +70,7 @@ class AnswerState(TypedDict):
     blocked: bool
     blocked_reason: str
     approved: bool
-    gen_count: int = 0
+    gen_count: int
 
 def retrieve(state: AnswerState)->dict:
     query = state["current_query"]
@@ -154,11 +154,13 @@ def tavily(state: AnswerState)->dict:
     return {"chunks": [web_context],"web_sources":web_sources}
 
 async def generator(state: AnswerState)->dict:
-    chain = build_llm_chain()
+    attempt = state.get("gen_count",0)
+    temperature = 0.0 if attempt == 0 else 0.7
+    chain = build_llm_chain(temperature=temperature)
     result = []
     async for chunk in chain.astream({"question":state["current_query"],"context": state["retrieved_context"]}):
         result.append(chunk.content)
-    return {"answer": "".join(result),"gen_count": state.get("gen_count",0)+1}
+    return {"answer": "".join(result),"gen_count": attempt+1}
 
 def hallucination_check(state: AnswerState)->dict:
     """Verify answer is grounded in retrieved chunks using an LLM-as-judge check."""
@@ -170,35 +172,30 @@ def route_after_hallucination_check(state: AnswerState)->str:
         return "generator_node"
     elif state["confidence"] < CONFIDENCE_THRESHOLD:
         return "human_review_node"
-    return END
-
-def human_review(state:AnswerState)-> Command:
-    if state["confidence"] >= CONFIDENCE_THRESHOLD:
-        return Command(
-            update = AnswerState(answer=state["answer"],approved= True),
-            goto="guardrails_output"
-        )
     else:
-        print("Interrupted.")
-        decision = interrupt({
+        return "guardrails_output"
+
+def human_review(state:AnswerState)-> Command[Literal["guardrails_output","__end__"]]:
+    print("Interrupted.")
+    decision = interrupt({
             "reason": "low_confidence",
             "confidence": state["confidence"],
             "query": state["current_query"],
             "draft_answer": state["answer"],
             "supporting_chunks": state["chunks"],
-        })
-        if decision == "approved":
-            answer = state["answer"]
-            approved = True
-            next_node =  "guardrails_output"
-        else:
-            answer = "Answer could not be found. Analyst rejects."
-            approved = False
-            next_node = END
-        return Command(
-            update=AnswerState(answer=answer,approved= approved),
-            goto=next_node
-        )
+    })
+    if decision == "approved":
+        answer = state["answer"]
+        approved = True
+        next_node =  "guardrails_output"
+    else:
+        answer = "Answer could not be found. Analyst rejects."
+        approved = False
+        next_node = END
+    return Command(
+        update=AnswerState(answer=answer,approved= approved),
+        goto=next_node
+    )
 
 async def guardrails_input_node(state: AnswerState)-> dict:
     return await guardrail_wrapper(state,"input")
