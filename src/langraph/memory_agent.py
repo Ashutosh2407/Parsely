@@ -33,7 +33,7 @@ def retrieve_context(state:ConversationState)-> dict:
 
 
 FOLLOWUP_RE = re.compile(
-    r"\b(they|those|these|it|that|them|compare|same|similar|how about|what about)\b",
+    r"\b(they|those|these|it|that|them|compare|same|similar|how about|what about | where | why)\b",
     re.IGNORECASE
 )
 

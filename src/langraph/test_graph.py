@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-CONFIDENCE_THRESHOLD = 0.75
+CONFIDENCE_THRESHOLD = 0.99
 
 def build_llm_chain(temperature:float = 0.0):
     llm = ChatOpenAI(
