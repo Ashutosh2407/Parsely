@@ -29,6 +29,43 @@ grounded, cited answers from a structured corpus of SEC filings.
 | Weaviate	            |  0.67	       | 0.72	            | 0.39              |
 
 ## Langraph Graph
+
+```mermaid
+graph TD
+    START([START]) --> GI[guardrails_input]
+
+    GI -->|blocked| END1([END])
+    GI -->|continue| RET[retriever_node]
+
+    RET --> GRD[grader_node]
+
+    GRD -->|grade >= 0.6| CTX[contextualize_node]
+    GRD -->|grade < 0.6| TAV[tavily_node<br/>web search fallback]
+
+    TAV --> CTX
+    CTX --> GEN[generator_node]
+    GEN --> HAL[hallucination_checker_node]
+
+    HAL -->|confidence < 0.75<br/>gen_count < 2<br/>retry @ temp 0.7| GEN
+    HAL -->|confidence < 0.75<br/>gen_count >= 2| HR[human_review_node<br/>interrupt]
+    HAL -->|confidence >= 0.75| GO[guardrails_output]
+
+    HR -->|approved| GO
+    HR -->|rejected| END2([END])
+
+    GO -->|blocked| END3([END])
+    GO -->|ok| END4([END])
+
+    classDef guard fill:#ffe6e6,stroke:#cc0000
+    classDef term fill:#e6e6e6,stroke:#666666
+    classDef human fill:#fff2cc,stroke:#d6b656
+
+    class GI,GO guard
+    class START,END1,END2,END3,END4 term
+    class HR human
+```
+
+## Contextualization Flow (for Follow up questions)
 ```mermaid
 flowchart TD
     __start__([<p>__start__</p>]):::first
