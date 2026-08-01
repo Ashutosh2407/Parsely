@@ -18,25 +18,27 @@ grounded, cited answers from a structured corpus of SEC filings.
 
 ## Features
 
+## Features
+
 ### Safety & Trust
-- **Input guardrails** — every query is screened before retrieval; unsafe or out-of-scope queries short-circuit to END without burning an LLM call.
-- **Output guardrails** — every generated answer is screened before it reaches the user. No path returns an answer that skipped this check.
-- **Grounding verification** — an LLM-as-judge compares the draft answer against the retrieved chunks and emits a confidence score. Answers below 0.75 never ship unreviewed.
-- **Source attribution** — every answer carries structured provenance: chunk ID, ticker, filing year, source document, and a text preview. Web-sourced answers carry title, URL, and preview instead.
+1. **Input guardrails** — every query is screened before retrieval; unsafe or out-of-scope queries short-circuit to END without burning an LLM call.
+2. **Output guardrails** — every generated answer is screened before it reaches the user. No path returns an answer that skipped this check.
+3. **Grounding verification** — an LLM-as-judge compares the draft answer against the retrieved chunks and emits a confidence score. Answers below 0.75 never ship unreviewed.
+4. **Source attribution** — every answer carries structured provenance: chunk ID, ticker, filing year, source document, and a text preview. Web-sourced answers carry title, URL, and preview instead.
 
 ### Retrieval Quality
-- **Relevance grading** — retrieved chunks are scored 0–1 for relevance to the question. Below an average of 0.6, the pipeline stops trusting the corpus.
-- **Web search fallback** — when the corpus can't answer (grade < 0.6), the query is routed to Tavily rather than forcing a hallucinated answer out of irrelevant chunks.
-- **Benchmarked strategy selection** — dense, sparse, hybrid, reranked, and Weaviate retrieval were evaluated on faithfulness, answer relevance, and context precision (see table above).
+1. **Relevance grading** — retrieved chunks are scored 0–1 for relevance to the question. Below an average of 0.6, the pipeline stops trusting the corpus.
+2. **Web search fallback** — when the corpus can't answer (grade < 0.6), the query is routed to Tavily rather than forcing a hallucinated answer out of irrelevant chunks.
+3. **Benchmarked strategy selection** — dense, sparse, hybrid, reranked, and Weaviate retrieval were evaluated on faithfulness, answer relevance, and context precision (see table above).
 
 ### Self-Correction
-- **Automatic regeneration** — a low-confidence answer triggers one retry at higher temperature (0.0 → 0.7) to sample a different response rather than repeating a deterministic failure.
-- **Bounded retries** — capped at 2 generations, so a hard question escalates instead of looping.
-- **Human-in-the-loop review** — persistent low confidence pauses the graph mid-execution via LangGraph `interrupt`, surfacing the draft answer, confidence score, and supporting chunks to an analyst. Approve to release; reject to return a clean "not found" instead of a guess.
+1. **Automatic regeneration** — a low-confidence answer triggers one retry at higher temperature (0.0 → 0.7) to sample a different response rather than repeating a deterministic failure.
+2. **Bounded retries** — capped at 2 generations, so a hard question escalates instead of looping.
+3. **Human-in-the-loop review** — persistent low confidence pauses the graph mid-execution via LangGraph `interrupt`, surfacing the draft answer, confidence score, and supporting chunks to an analyst. Approve to release; reject to return a clean "not found" instead of a guess.
 
 ### Conversation
-- **Multi-turn context** — follow-up questions are rewritten into standalone queries before retrieval, so "what about their debt?" resolves against the prior turn.
-- **Durable state** — a checkpointer persists graph state per thread, which is what makes mid-run interrupt-and-resume possible across separate invocations.
+1. **Multi-turn context** — follow-up questions are rewritten into standalone queries before retrieval, so "what about their debt?" resolves against the prior turn.
+2. **Durable state** — a checkpointer persists graph state per thread, which is what makes mid-run interrupt-and-resume possible across separate invocations.
 
 ## Day 4 Retrieval Test Results
 ![Langchain Dashboard](langchaindashboard.png)
@@ -47,10 +49,12 @@ grounded, cited answers from a structured corpus of SEC filings.
 | Dense (Pinecone)      |  0.44        | 0.62             | 0.48              |
 | Sparse (BM25)         |  0.70        | 0.77             | 0.44              | 
 | Hybrid (BM25 + Dense) |  0.78        | 0.81             | 0.45              |
-| Compresession (rerank)|  0.68        | 0.87             | 0.62              |
-| Weaviate	            |  0.67	       | 0.72	            | 0.39              |
+| Compression (rerank)  |  0.68        | 0.87             | 0.62              |
+| Weaviate **	        |   0.67	   | 0.72	          | 0.39              |
 
-## Langraph Graph
+**Weaviate** has 10-K, Earnings transcripts and regulatory filing data unlike the rest.
+
+## LanGraph Graph
 
 ```mermaid
 graph TD
