@@ -86,3 +86,6 @@ flowchart TD
 
 ## Demo 2 : Multi-turn chat
 ![Demo](https://github.com/user-attachments/assets/b9049608-6765-4678-a5e5-a405cfb4db9a)
+
+## Demo 3 : Human in the Loop
+<div style="position: relative; padding-bottom: 56.25%; height: 0;"><iframe src="https://www.loom.com/embed/164c78fb8d3449a0a2221e20fe7bb7e5" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
