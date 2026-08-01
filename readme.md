@@ -30,7 +30,7 @@ grounded, cited answers from a structured corpus of SEC filings.
 
 ## Langraph Graph
 
-```mermaid
+mermaid
 graph TD
     START([START]) --> GI[guardrails_input]
 
@@ -63,7 +63,7 @@ graph TD
     class GI,GO guard
     class START,END1,END2,END3,END4 term
     class HR human
-```
+
 
 ## Contextualization Flow (for Follow up questions)
 ```mermaid
