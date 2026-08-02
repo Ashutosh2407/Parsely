@@ -19,10 +19,10 @@ grounded, cited answers from a structured corpus of SEC filings.
 ## Features
 
 ### Safety & Trust
-1. **Input guardrails** — every query is screened before retrieval; unsafe or out-of-scope queries short-circuit to END without burning an LLM call.
-2. **Output guardrails** — every generated answer is screened before it reaches the user. No path returns an answer that skipped this check.
-3. **Grounding verification** — an LLM-as-judge compares the draft answer against the retrieved chunks and emits a confidence score. Answers below 0.75 never ship unreviewed.
-4. **Source attribution** — every answer carries structured provenance: chunk ID, ticker, filing year, source document, and a text preview. Web-sourced answers carry title, URL, and preview instead.
+1. **Input guardrails** — every query is screened before retrieval by a Guardrails AI `PromptInjectionDetector` (instruction overrides, system-prompt extraction, jailbreak patterns), plus a scope check that rejects non-financial queries. Blocked queries short-circuit to END without triggering retrieval or generation. Thus, **no wasted LLM spend, no wasted latency.**
+2. **Output guardrails** — every generated answer is scanned for PII (email addresses, phone numbers) before it reaches the user. No path returns an answer that skipped this check.
+4. **Grounding verification** — an LLM-as-judge compares the draft answer against the retrieved chunks and emits a confidence score. Answers below 0.75 never ship unreviewed.
+5. **Source attribution** — every answer carries structured provenance: chunk ID, ticker, filing year, source document, and a text preview. Web-sourced answers carry title, URL, and preview instead.
 
 ### Retrieval Quality
 1. **Relevance grading** — retrieved chunks are scored 0–1 for relevance to the question. Below an average of 0.6, the pipeline stops trusting the corpus.
@@ -38,7 +38,7 @@ grounded, cited answers from a structured corpus of SEC filings.
 1. **Multi-turn context** — follow-up questions are rewritten into standalone queries before retrieval, so "what about their debt?" resolves against the prior turn.
 2. **Durable state** — a checkpointer persists graph state per thread, which is what makes mid-run interrupt-and-resume possible across separate invocations.
 
-## Day 4 Retrieval Test Results
+## Pinecone Retrieval Test Results
 ![Langchain Dashboard](langchaindashboard.png)
 
 ## Retrieval Strategy Benchmark
